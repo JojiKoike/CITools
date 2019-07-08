@@ -1,0 +1,10 @@
+---
+- hosts: jenkins_servers
+  become: yes
+  roles:
+    - common
+    - openjdk
+    - openmodelica
+    - pyenv
+    - ndenv
+    - jenkins

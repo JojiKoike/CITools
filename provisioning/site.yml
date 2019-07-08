@@ -1,0 +1,4 @@
+---
+- import_playbook: jenkins.yml
+- import_playbook: sonar.yml
+- import_playbook: citools.yml

@@ -1,0 +1,10 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<proxy>
+  <name>172.31.207.161</name>
+  <port>8800</port>
+  <noProxyHost>localhost
+127.0.0.1
+zsas006sv:8084</noProxyHost>
+  <secretPassword>{AQAAABAAAAAQTytdRDgyaw3s0Ao9Oamd6HkS17PB4BBeKnZirT0JHu8=}</secretPassword>
+  <testUrl>http://zsas006sv:8084</testUrl>
+</proxy>

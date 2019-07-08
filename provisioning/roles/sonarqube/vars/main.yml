@@ -1,0 +1,3 @@
+sonarqube_download_url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.6.zip
+sonarqube_download_filename: sonarqube-6.7.6.zip
+sonarqube_root_foldername: sonarqube-6.7.6

@@ -1,0 +1,10 @@
+---
+- hosts: sonar_servers
+  become: yes
+  roles:
+    - common
+    - openjdk
+    - pyenv
+    - ndenv
+    - mysql
+    - sonarqube

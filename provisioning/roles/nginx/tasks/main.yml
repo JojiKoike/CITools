@@ -1,0 +1,22 @@
+---
+- name: Add nginx activation user
+  user:
+   name: nginx
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: start and enable nginx service
+  service:
+    name: nginx
+    enabled: yes
+
+- name: deploy nginx default server configulation file
+  template:
+    src: default.j2
+    dest: /etc/nginx/sites-available/default
+  notify: restart nginx

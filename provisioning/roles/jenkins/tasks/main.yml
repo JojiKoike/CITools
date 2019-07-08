@@ -1,0 +1,86 @@
+---
+- name: Add Jenkins Official apt repository
+  apt_repository:
+    repo: "{{ jenkins_repo }}"
+    state: present
+
+- name: Install Jenkins apt repository key
+  apt_key:
+    url: "{{ jenkins_repo_key }}"
+    state: present
+
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    force: yes
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Start and Enable Jenkins
+  service:
+    name: jenkins
+    state: started
+    enabled: True
+
+- name: Download Jenkins cli tool
+  get_url:
+    url: http://localhost:8080/jnlpJars/jenkins-cli.jar
+    use_proxy: no
+    dest: /tmp
+  ignore_errors: yes
+
+- name: Get Init Password
+  shell: "cat /var/lib/jenkins/secrets/initialAdminPassword"
+  changed_when: false
+  register: result
+  ignore_errors: yes
+
+- name: Print Init Password
+  debug:
+    var: result.stdout
+  ignore_errors: yes
+
+- name: Install Jenkins Plugins
+  action: command java -jar /tmp/jenkins-cli.jar -s http://localhost:8080 -auth '{{jenkins_user}}':'{{jenkins_password}}' install-plugin '{{ item.name }}'
+  with_items:
+    - name: emotional-jenkins-plugin
+    - name: cobertura
+    - name: jobConfigHistory
+    - name: tasks
+    - name: next-executions
+    - name: nodejs
+    - name: sonar
+    - name: sonar-quality-gates
+    - name: analysis-collector
+    - name: violations
+  notify: restart jenkins
+  ignore_errors: yes
+
+- name: Copy Jenkins Configuration Files
+  copy:
+    src: "{{ item }}"
+    dest: /var/lib/jenkins
+  with_fileglob:
+    - "config/*.xml"
+  notify: restart jenkins
+
+- name: Setup Jenkins Jobs
+  copy: 
+    src: jobs
+    dest: /var/lib/jenkins
+  ignore_errors: yes
+
+- name : Change Jenkins Jobs Directory Ownership
+  file:
+    path: /var/lib/jenkins/jobs
+    owner: jenkins
+    group: jenkins
+    mode: 0755
+    recurse: yes
+  notify: restart jenkins
+  ignore_errors: yes
+
+  
+
+

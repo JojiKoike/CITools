@@ -1,0 +1,4 @@
+sonarqube_db: sonarqubedb
+sonarqube_db_user: sonardbuser
+sonarqube_db_password: sonardbpassword
+sonarqube_db_host: localhost

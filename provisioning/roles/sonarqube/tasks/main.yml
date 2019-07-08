@@ -1,0 +1,52 @@
+---
+- name: Add Sonar Group
+  group:
+    name: sonar
+
+- name: Add Sonar User
+  user: 
+    name: sonar
+    group: sonar
+
+- stat: path=/tmp/{{ sonarqube_download_filename }}
+  register: sonarqubedownloadfile
+- name: Download LTS SonarQube Community Edition
+  get_url:
+    url: "{{ sonarqube_download_url }}"
+    dest: /tmp
+  when: not sonarqubedownloadfile.stat.exists
+
+- name: Extract SonarQube Application File
+  unarchive:
+    src: /tmp/{{ sonarqube_download_filename }}
+    dest: /opt
+    owner: sonar
+    group: sonar
+  when: not sonarqubedownloadfile.stat.exists
+
+- stat: path=/opt/sonar
+  register: sonarqubedir
+- name: Rename SonarQube Root Directory Name
+  command: mv /opt/{{ sonarqube_root_foldername }} /opt/sonar
+  when: not sonarqubedir.stat.exists
+
+- name: Deploy SonarProperties File (sonar.properties)
+  template:
+    src: sonar.properties.j2
+    dest: /opt/sonar/conf/sonar.properties
+
+- name: Deploy Sonar Wrapper Config file (wrapper.conf)
+  template:
+    src: wrapper.conf.j2
+    dest: /opt/sonar/conf/wrapper.conf
+
+- name: Deploy SonarQube Service File (sonar.service)
+  template:
+    src: sonar.service.j2
+    dest: /etc/systemd/system/sonar.service
+
+- name: Start and Enable SonarQube
+  service:
+    name: sonar
+    state: started
+    enabled: True

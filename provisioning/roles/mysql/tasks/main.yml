@@ -1,0 +1,53 @@
+---
+- name: Install MySQL Database Server
+  apt:
+    name: '{{ item.name }}'
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items:
+    - name: mysql-server
+    - name: mysql-client
+    - name: mysql-common
+
+- name: Start and Enable MySQL Service
+  service:
+    name: mysql
+    state: started
+    enabled: True
+
+- name: Install MySQL-python
+  apt:
+    name: python-mysqldb
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Removes anonymous localhost user account
+  mysql_user:
+    name: ''
+    host: localhost
+    state: absent
+
+- name: Removes all anonymous user acounts
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+
+- name: Create SonarQube DB 
+  mysql_db:
+    name: "{{ sonarqube_db }}"
+    state: present
+    encoding: utf8mb4
+
+- name: Create SonarQube DB User
+  mysql_user:
+    name: "{{ sonarqube_db_user }}"
+    host: "{{ sonarqube_db_host }}"
+    password: "{{ sonarqube_db_password }}"
+    priv: "{{ sonarqube_db }}.*:ALL"
+    state: present
+  
+
+ 

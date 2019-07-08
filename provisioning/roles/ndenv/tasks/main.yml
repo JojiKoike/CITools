@@ -1,0 +1,53 @@
+---
+- stat: path=/home/vagrant/.ndenv
+  register: ndenvdir
+- name: Install ndenv
+  become_user: vagrant
+  git:
+    repo: https://github.com/riywo/ndenv
+    dest: /home/vagrant/.ndenv
+  when: not ndenvdir.stat.exists
+
+- name: Create ndenv plugin dir
+  file: 
+    path: /home/vagrant/.ndenv/plugins
+    state: directory
+    owner: vagrant
+
+- name: Create ndenv versions dir
+  file:
+    path: /home/vagrant/.ndenv/versions
+    state: directory
+    owner: vagrant
+
+- name: Create ndenv shims dir
+  file:
+    path: /home/vagrant/.ndenv/shims
+    state: directory
+    owner: vagrant
+
+- stat: path=/home/vagrant/.ndenv/plugins/node-build
+  register: nodebuilddir
+- name: Install node-build ndenv plugin
+  become_user: vagrant
+  git:
+    repo: https://github.com/riywo/node-build.git
+    dest: /home/vagrant/.ndenv/plugins/node-build
+  when: not nodebuilddir.stat.exists
+ 
+- name: Add configuration for pyenv to ~/.bashrc
+  blockinfile:
+    path: /home/vagrant/.bashrc
+    block: |
+      export NDENV_ROOT="$HOME/.ndenv"
+      export PATH="$NDENV_ROOT/bin:$PATH"
+      eval "$(ndenv init -)"
+ 
+- stat: path=/home/vagrant/.ndenv/versions/{{ node_version }}
+  register: nodedir
+- name: Install node.js and Set Global Version
+  become_user: vagrant
+  shell: "/home/vagrant/.ndenv/bin/ndenv install {{ node_version }} && /home/vagrant/.ndenv/bin/ndenv global {{ node_version }}"
+  when: not nodedir.stat.exists
+ 
+ 
